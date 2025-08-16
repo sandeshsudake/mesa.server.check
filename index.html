@@ -213,7 +213,6 @@
 
 <script>
     const endpoints = [
-        // Replace with your actual server URLs.
         { 
             id: 'server1', 
             name: "Primary Server", 
@@ -297,27 +296,23 @@
         mainStatusText.focus();
     }
 
-    // --- Core Logic with Retry Mechanism ---
-    async function checkServer(ep, retries = 3) {
+    // --- Core Logic for Fast Check ---
+    async function checkServer(ep) {
         updateServiceUI(ep.id, 'info', 'Checking...');
-        
-        for (let i = 0; i < retries; i++) {
-            console.log(`Attempt ${i + 1} to connect to ${ep.name}...`);
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 5000); 
-                const res = await fetch(ep.checkUrl, { signal: controller.signal });
-                clearTimeout(timeoutId);
-                
-                if (res.ok) {
-                    console.log(`Successfully connected to ${ep.name} on attempt ${i + 1}`);
-                    updateServiceUI(ep.id, 'success', 'Operational');
-                    return true;
-                }
-            } catch (err) {
-                console.warn(`Connection to ${ep.name} failed. Attempt ${i + 1} of ${retries}.`);
-                await new Promise(r => setTimeout(r, 2000));
+        try {
+            const controller = new AbortController();
+            // Reduced timeout for a faster check
+            const timeoutId = setTimeout(() => controller.abort(), 3000); 
+            const res = await fetch(ep.checkUrl, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            
+            if (res.ok) {
+                console.log(`Successfully connected to ${ep.name}`);
+                updateServiceUI(ep.id, 'success', 'Operational');
+                return true;
             }
+        } catch (err) {
+            console.warn(`Connection to ${ep.name} failed.`);
         }
         
         updateServiceUI(ep.id, 'error', 'Failed');
@@ -340,7 +335,7 @@
         }
 
         // --- Attempt #2: Backup Server (if #1 fails) ---
-        await new Promise(r => setTimeout(r, 1500));
+        await new Promise(r => setTimeout(r, 500));
         loadingState.querySelector('#subStatusText').innerText = `Primary server failed. Trying ${endpoints[1].name}...`;
 
         if (await checkServer(endpoints[1])) {
