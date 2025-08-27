@@ -1,372 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mesa - Service Status Page</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-    /* --- Main Variables --- */
-    :root {
-        --bg-color: #f1f5f9;
-        --header-bg: #002147;
-        --header-text: #ffffff;
-        --card-bg: #ffffff;
-        --text-primary: #1e293b;
-        --text-secondary: #475569;
-        --primary-color: #004080;
-        --success-color: #16a34a;
-        --error-color: #b91c1c;
-        --info-color: #0369a1;
-        --border-color: #dce1e7;
-    }
-    body {
-        font-family: 'Inter', sans-serif;
-        margin: 0;
-        background-color: var(--bg-color);
-        color: var(--text-primary);
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-    }
-    header {
-        background-color: var(--header-bg);
-        color: var(--header-text);
-        padding: 15px 20px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        border-bottom: 4px solid #f1f5f9;
-    }
-    header img { height: 46px; }
-    header h1 { margin: 0; font-size: 1.35rem; font-weight: 600; }
-    header small { font-size: 0.85rem; display: block; opacity: 0.95; }
-    footer {
-        background-color: #f8fafc;
-        border-top: 1px solid var(--border-color);
-        padding: 12px 20px;
-        font-size: 0.85rem;
-        color: var(--text-secondary);
-        text-align: center;
-    }
-    footer strong { color: var(--text-primary); }
-    main {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        padding: 30px 15px;
-    }
-    .status-container {
-        max-width: 600px;
-        width: 100%;
-        background-color: var(--card-bg);
-        padding: 25px 30px;
-        border-radius: 6px;
-        border: 1px solid var(--border-color);
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        animation: fadeIn 0.6s ease-in-out;
-    }
-    h2 { margin: 0 0 6px 0; font-size: 1.2rem; font-weight: 600; }
-    p { margin-top: 0; margin-bottom: 12px; font-size: 0.95rem; color: var(--text-secondary); line-height: 1.4; }
-    .badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 4px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        margin-top: 6px;
-        transition: background-color 0.3s ease, color 0.3s ease;
-    }
-    .badge.success { background: #e6f7ec; color: var(--success-color); }
-    .badge.error   { background: #fce8e8; color: var(--error-color); }
-    .badge.info    { background: #e6f2fa; color: var(--info-color); }
-    .spinner {
-        width: 48px;
-        height: 48px;
-        border: 3px solid #cbd5e1;
-        border-top-color: var(--primary-color);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin: 18px auto;
-        transition: border-top-color 0.3s ease;
-    }
-    .status-icon {
-        display: none;
-        margin: 18px auto;
-        color: var(--error-color);
-        animation: bounceIn 0.5s ease-in-out;
-    }
-    .status-icon.visible { display: block; }
-    .service-status-list {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        margin-top: 20px;
-    }
-    .service-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 15px;
-        background-color: var(--bg-color);
-        border: 1px solid var(--border-color);
-        border-radius: 4px;
-        font-size: 0.9rem;
-    }
-    .status-dot {
-        height: 10px;
-        width: 10px;
-        border-radius: 50%;
-        margin-right: 8px;
-        display: inline-block;
-        vertical-align: middle;
-        transition: background-color 0.3s ease;
-    }
-    .status-dot.info { background-color: var(--info-color); }
-    .status-dot.success { background-color: var(--success-color); }
-    .status-dot.error { background-color: var(--error-color); }
-    #retryButton {
-        display: none;
-        margin-top: 15px;
-        padding: 10px 18px;
-        font-size: 1rem;
-        font-weight: 600;
-        border: none;
-        border-radius: 4px;
-        background: var(--primary-color);
-        color: white;
-        cursor: pointer;
-        transition: background-color 0.2s ease, opacity 0.2s ease;
-    }
-    #retryButton:hover:not(:disabled) { background: #002d59; }
-    #retryButton:disabled {
-        background: #a1b0c0;
-        cursor: not-allowed;
-        opacity: 0.8;
-    }
-    .legend {
-        margin-top: 20px;
-        font-size: 0.85rem;
-        color: var(--text-secondary);
-    }
-    .legend span { margin-right: 12px; }
-    @keyframes fadeIn {
-        from {opacity: 0; transform: translateY(8px);}
-        to {opacity: 1; transform: translateY(0);}
-    }
-    @keyframes spin { to {transform: rotate(360deg);} }
-    @keyframes bounceIn {
-        0% {transform: scale(0.5); opacity: 0;}
-        80% {transform: scale(1.1); opacity: 1;}
-        100% {transform: scale(1);}
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MESA - Scheduled Maintenance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(120deg, #e3f0ff 0%, #f7fafd 100%);
+            color: #1a2a3a;
+            box-sizing: border-box;
+        }
+        .maintenance-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 32px 16px;
+            text-align: center;
+            position: relative;
+        }
+        .maintenance-card {
+            background: rgba(255,255,255,0.98);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0,120,215,0.10);
+            padding: 2.5rem 2rem 2rem 2rem;
+            max-width: 480px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .maintenance-icon {
+            font-size: 5rem;
+            color: #0078d7;
+            margin-bottom: 1.2rem;
+            animation: fadeInSlideUp 1.2s;
+        }
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 0.7rem;
+            color: #1a2a3a;
+            letter-spacing: -1px;
+            animation: fadeInScale 1s 0.2s both;
+        }
+        .maintenance-desc {
+            font-size: 1.15rem;
+            color: #3a4a5a;
+            margin-bottom: 1.2rem;
+            line-height: 1.7;
+            animation: fadeIn 1s 0.4s both;
+        }
+        .maintenance-status {
+            font-size: 1.08rem;
+            color: #0078d7;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            animation: fadeIn 1s 0.6s both;
+        }
+        .progress-bar-container {
+            width: 100%;
+            max-width: 340px;
+            background: #e0eaf2;
+            border-radius: 12px;
+            height: 16px;
+            overflow: hidden;
+            margin: 0 auto 1.2rem auto;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.10);
+            animation: fadeIn 1s 0.8s both;
+        }
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #0078d7 0%, #43a047 100%);
+            border-radius: 12px;
+            box-shadow: 0 0 12px rgba(67,160,71,0.13);
+            animation: fillProgress 2.5s forwards 1.1s;
+        }
+        .maintenance-estimate {
+            font-size: 1rem;
+            color: #444;
+            margin-bottom: 1.5rem;
+            animation: fadeIn 1s 1s both;
+        }
+        .contact-link {
+            font-size: 1rem;
+            color: #fff;
+            background: linear-gradient(90deg, #0078d7, #43a047);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 28px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,120,215,0.10);
+            transition: background 0.2s, transform 0.2s;
+            display: inline-block;
+            margin-bottom: 1.2rem;
+            animation: fadeIn 1s 1.2s both;
+        }
+        .contact-link:hover, .contact-link:focus {
+            background: linear-gradient(90deg, #43a047, #0078d7);
+            transform: translateY(-2px) scale(1.04);
+            outline: none;
+        }
+        .maintenance-footer {
+            font-size: 0.95rem;
+            color: #8b9bb0;
+            text-align: center;
+            font-weight: 400;
+            margin-top: 2rem;
+            animation: fadeIn 1s 1.4s both;
+        }
+        .maintenance-footer a {
+            color: #0078d7;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+        @keyframes fadeInSlideUp {
+            0% { opacity: 0; transform: translateY(20px);}
+            100% { opacity: 1; transform: translateY(0);}
+        }
+        @keyframes fadeInScale {
+            0% { opacity: 0; transform: scale(0.95);}
+            100% { opacity: 1; transform: scale(1);}
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0;}
+            100% { opacity: 1;}
+        }
+        @keyframes fillProgress {
+            0% { width: 0%;}
+            100% { width: 80%;}
+        }
+        @media (max-width: 600px) {
+            .maintenance-card {
+                padding: 1.2rem 0.5rem;
+                max-width: 98vw;
+            }
+            h1 { font-size: 1.25rem; }
+            .maintenance-desc, .maintenance-status, .maintenance-estimate { font-size: 0.98rem; }
+            .progress-bar-container { height: 10px; }
+            .maintenance-footer { font-size: 0.8rem; margin-top: 1rem; }
+            .maintenance-icon { font-size: 3rem; }
+        }
+        @media (max-width: 400px) {
+            .maintenance-card { padding: 0.7rem 0.2rem; }
+            h1 { font-size: 1rem; }
+            .maintenance-icon { font-size: 2.2rem; }
+        }
+    </style>
 </head>
 <body>
-
-<header>
-    <img src="MESA-Logo.jpg" alt="Emblem">
-    <div>
-        <h1>Mesa</h1>
-        <small>Service Status Portal</small>
-    </div>
-</header>
-
-<main>
-    <div class="status-container" role="alert" aria-labelledby="mainStatusText">
-        <h2 id="mainStatusText" aria-live="polite" tabindex="-1">Checking Service Availability</h2>
-        <span id="overallStatusBadge" class="badge info">Checking...</span>
-
-        <div id="loadingState">
-            <div id="spinner" class="spinner"></div>
-            <p id="subStatusText">Please wait while we securely connect to our service endpoints.</p>
-        </div>
-
-        <div id="finalErrorState" style="display: none;">
-            <div id="statusIcon" class="status-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                </svg>
+    <div class="maintenance-container">
+        <div class="maintenance-card">
+            <i class="fas fa-tools maintenance-icon" aria-hidden="true"></i>
+            <h1>Scheduled Maintenance</h1>
+            <div class="maintenance-desc">
+                Our platform is currently undergoing a planned update to improve performance and security.<br>
+                <span class="maintenance-status"><i class="fas fa-circle-notch fa-spin"></i> Service Temporarily Unavailable</span>
             </div>
-            <p id="errorDetails"></p>
+            <div class="progress-bar-container">
+                <div class="progress-bar"></div>
+            </div>
+            <div class="maintenance-estimate">
+                Estimated completion: <strong>2–4 hours</strong>.<br>
+                Thank you for your patience!
+            </div>
+            <a href="mailto:sandeshsudake818@gmail.com" class="contact-link"><i class="fas fa-envelope"></i> Contact Support</a>
         </div>
-
-        <div id="serviceStatusList" class="service-status-list"></div>
-
-        <div class="legend">
-            <span><span class="status-dot success"></span>Operational</span>
-            <span><span class="status-dot info"></span>Checking</span>
-            <span><span class="status-dot error"></span>Failed</span>
+        <div class="maintenance-footer">
+            &copy; 2025 MESA. All rights reserved.<br>
+            For urgent technical inquiries, email <a href="mailto:sandeshsudake818@gmail.com">IT Support</a>.
         </div>
-
-        <button id="retryButton">Try Again</button>
     </div>
-</main>
-
-<footer>
-    <strong>Status page</strong> – Last Updated: <span id="timestamp"></span><br>
-    &copy; <span id="year"></span> Mesa. All Rights Reserved.
-</footer>
-
-<script>
-    const endpoints = [
-        { 
-            id: 'server1', 
-            name: "Primary Server", 
-            checkUrl: "https://mesa-springboot.onrender.com/healthCheck",
-            redirectUrl: "https://mesa-springboot.onrender.com"
-        },
-        { 
-            id: 'server2', 
-            name: "Backup Endpoint", 
-            checkUrl: "https://mesa-sknscoe.onrender.com/healthCheck",
-            redirectUrl: "https://mesa-sknscoe.onrender.com"
-        }
-    ];
-
-    const mainStatusText = document.getElementById("mainStatusText");
-    const overallStatusBadge = document.getElementById("overallStatusBadge");
-    const loadingState = document.getElementById("loadingState");
-    const finalErrorState = document.getElementById("finalErrorState");
-    const errorDetails = document.getElementById("errorDetails");
-    const retryButton = document.getElementById("retryButton");
-    const serviceStatusList = document.getElementById("serviceStatusList");
-    const timestampSpan = document.getElementById("timestamp");
-    const yearSpan = document.getElementById("year");
-
-    function updateTimestamp() {
-        const now = new Date();
-        timestampSpan.innerText = now.toLocaleString();
-        yearSpan.innerText = now.getFullYear();
-    }
-
-    function serviceListInit() {
-        serviceStatusList.innerHTML = endpoints.map(ep => `
-            <div id="service-${ep.id}" class="service-item">
-                <div><span class="status-dot info"></span>${ep.name}</div>
-                <span class="badge info">Pending</span>
-            </div>`).join('');
-    }
-
-    function updateServiceUI(endpointId, status, text) {
-        const item = document.getElementById(`service-${endpointId}`);
-        if (!item) return;
-        const dot = item.querySelector('.status-dot');
-        const badge = item.querySelector('.badge');
-        dot.className = `status-dot ${status}`;
-        badge.className = `badge ${status}`;
-        badge.innerText = text;
-    }
-
-    function setUIState(state, data = {}) {
-        loadingState.style.display = 'none';
-        finalErrorState.style.display = 'none';
-        retryButton.style.display = 'none';
-        retryButton.disabled = false;
-        retryButton.innerHTML = 'Try Again';
-
-        switch (state) {
-            case 'loading':
-                loadingState.style.display = 'block';
-                mainStatusText.innerText = data.mainText || "Checking Service Availability";
-                overallStatusBadge.className = "badge info";
-                overallStatusBadge.innerText = data.overallBadgeText || "Checking...";
-                retryButton.innerHTML = 'Connecting...';
-                retryButton.style.display = 'inline-block';
-                retryButton.disabled = true;
-                break;
-            case 'success':
-                mainStatusText.innerText = data.mainText || "Service Operational";
-                overallStatusBadge.className = "badge success";
-                overallStatusBadge.innerText = data.overallBadgeText || "Operational";
-                loadingState.style.display = 'block'; 
-                break;
-            case 'error':
-                mainStatusText.innerText = data.mainText || "Service Temporarily Unavailable";
-                overallStatusBadge.className = "badge error";
-                overallStatusBadge.innerText = data.overallBadgeText || "Unavailable";
-                finalErrorState.style.display = 'block';
-                errorDetails.innerHTML = data.errorDetails || '';
-                retryButton.style.display = 'inline-block';
-                break;
-        }
-        mainStatusText.focus();
-    }
-
-    // --- Core Logic for Fast Check ---
-    async function checkServer(ep) {
-        updateServiceUI(ep.id, 'info', 'Checking...');
-        try {
-            const controller = new AbortController();
-            // Reduced timeout for a faster check
-            const timeoutId = setTimeout(() => controller.abort(), 3000); 
-            const res = await fetch(ep.checkUrl, { signal: controller.signal });
-            clearTimeout(timeoutId);
-            
-            if (res.ok) {
-                console.log(`Successfully connected to ${ep.name}`);
-                updateServiceUI(ep.id, 'success', 'Operational');
-                return true;
-            }
-        } catch (err) {
-            console.warn(`Connection to ${ep.name} failed.`);
-        }
-        
-        updateServiceUI(ep.id, 'error', 'Failed');
-        return false;
-    }
-
-    async function connect() {
-        setUIState('loading', { overallBadgeText: "Scanning...", mainText: "Checking Service Availability" });
-        serviceListInit();
-
-        // --- Attempt #1: Primary Server ---
-        if (await checkServer(endpoints[0])) {
-            setUIState('success', { overallBadgeText: "Operational" });
-            loadingState.querySelector('#subStatusText').innerText = "Redirecting to the requested service...";
-            setTimeout(() => {
-                window.location.href = endpoints[0].redirectUrl; 
-                console.log(`Redirecting to: ${endpoints[0].redirectUrl}`);
-            }, 1000);
-            return;
-        }
-
-        // --- Attempt #2: Backup Server (if #1 fails) ---
-        await new Promise(r => setTimeout(r, 500));
-        loadingState.querySelector('#subStatusText').innerText = `Primary server failed. Trying ${endpoints[1].name}...`;
-
-        if (await checkServer(endpoints[1])) {
-            setUIState('success', { overallBadgeText: "Operational" });
-            loadingState.querySelector('#subStatusText').innerText = "Redirecting to the requested service...";
-            setTimeout(() => {
-                window.location.href = endpoints[1].redirectUrl;
-                console.log(`Redirecting to: ${endpoints[1].redirectUrl}`);
-            }, 1000);
-            return;
-        }
-
-        // --- Final State: Both servers failed ---
-        const failedServers = endpoints.filter(ep => document.getElementById(`service-${ep.id}`).querySelector('.status-dot').classList.contains('error'));
-        const errorId = `SVC-ERR-${Date.now()}`;
-        
-        setUIState('error', {
-            errorDetails: `
-                <p>We are currently experiencing <strong>high traffic</strong> or a <strong>technical outage</strong>. Our technical team has been automatically notified and is working to restore services.</p>
-                <p style="margin-top: 15px;">The following endpoints failed to respond: <strong>${failedServers.map(ep => ep.name).join(', ')}</strong>.</p>
-                <p style="margin-top: 15px;">You may also visit our <a href="#" target="_blank" style="color:var(--primary-color);font-weight:600;">official status dashboard</a> for continuous updates.</p>
-                <p style="font-size:0.85rem;color:var(--text-secondary);">Error Reference: <strong>${errorId}</strong></p>
-            `,
-            overallBadgeText: 'Unavailable',
-            mainText: 'Service Temporarily Unavailable'
-        });
-    }
-
-    updateTimestamp();
-    connect();
-    retryButton.addEventListener("click", connect);
-</script>
 </body>
 </html>
